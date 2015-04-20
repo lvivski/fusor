@@ -1,5 +1,3 @@
-var Flux = {}
-
 Flux.createStore = function (spec) {
 	var store = new Store
 	extend(store, spec)
@@ -27,7 +25,7 @@ Flux.createActions = function (spec) {
 	for (var action in spec) {
 		if (spec.hasOwnProperty(action)) {
 			var value = spec[action],
-				actionName = isString(action) ? action : value
+				actionName = isObject(value) ? action : value
 
 			actions[actionName] = isObject(value) ?
 				this.createActions(value) :

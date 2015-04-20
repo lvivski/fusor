@@ -1,9 +1,9 @@
 JS_COMPILER ?= ./node_modules/uglify-js/bin/uglifyjs
 FILES = \
 	src/flex.js \
-	src/store.js \
 	src/flux.js \
 	src/mixins.js \
+	src/store.js \
 	src/utils.js \
 
 all: \

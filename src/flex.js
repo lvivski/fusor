@@ -1,4 +1,4 @@
-var Promise, Stream
+var Promise, Stream, Flux = {}
 if (typeof define === 'function' && define.amd) {
     define(['davy', 'streamlet'], function (davy, streamlet) {
         Promise = davy
