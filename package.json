@@ -1,0 +1,31 @@
+{
+  "name": "flex",
+  "version": "0.0.1",
+  "description": "Flexible Flux Implementation",
+  "scripts": {
+    "prepublish": "make -B"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lvivski/flex.git"
+  },
+  "keywords": [
+    "flux",
+    "flex",
+    "react",
+    "reactive"
+  ],
+  "author": "Yehor Lvivski <lvivski@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lvivski/flex/issues"
+  },
+  "homepage": "https://github.com/lvivski/flex",
+  "devDependencies": {
+    "uglify-js": "^2.4.19"
+  },
+  "dependencies": {
+    "davy": "^0.3.3",
+    "streamlet": "^0.1.0"
+  }
+}
