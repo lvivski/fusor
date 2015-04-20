@@ -1,6 +1,6 @@
 {
   "name": "flex",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Flexible Flux Implementation",
   "scripts": {
     "prepublish": "make -B"
