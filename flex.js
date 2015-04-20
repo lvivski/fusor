@@ -25,8 +25,8 @@
     return store;
   };
   Flux.createAction = function(name) {
-    var stream = new Stream(), action = function Action() {
-      stream.add.apply(Action, arguments);
+    var stream = new Stream(), action = function Action(data) {
+      stream.add(data);
     };
     extend(action, stream, {
       actionName: name
