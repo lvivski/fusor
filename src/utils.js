@@ -2,8 +2,9 @@ function extend(obj) {
 	if (!isObject(obj) && !isFunction(obj)) {
 		return obj
 	}
-	for (var i = 1; i < arguments.length; ++i) {
-		var source = arguments[i]
+	var i = 0
+	while (i < arguments.length) {
+		var source = arguments[i++]
 		for (var property in source) {
 			obj[property] = source[property]
 		}

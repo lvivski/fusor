@@ -1,6 +1,5 @@
 Flux.createStore = function (spec) {
-	var store = new Store
-	extend(store, spec)
+	var store = extend(new Store, spec)
 
 	if (isFunction(spec.initialize)) {
 		spec.initialize.call(store)
@@ -11,19 +10,18 @@ Flux.createStore = function (spec) {
 
 Flux.createAction = function (name) {
 	var controller = Stream.create(),
+		stream = controller.stream,
 		action = function Action(data) {
 			controller.add(data)
 		},
 		extra = {
 			actionName: name,
 			listen: function () {
-				controller.stream.listen.apply(controller.stream, arguments)
+				stream.listen.apply(stream, arguments)
 			}
 		}
 
-	extend(action, extra)
-
-	return action
+	return extend(action, extra)
 }
 
 Flux.createActions = function (spec) {

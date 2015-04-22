@@ -17,24 +17,22 @@
     global.Flex = Flux;
   }
   Flux.createStore = function(spec) {
-    var store = new Store();
-    extend(store, spec);
+    var store = extend(new Store(), spec);
     if (isFunction(spec.initialize)) {
       spec.initialize.call(store);
     }
     return store;
   };
   Flux.createAction = function(name) {
-    var controller = Stream.create(), action = function Action(data) {
+    var controller = Stream.create(), stream = controller.stream, action = function Action(data) {
       controller.add(data);
     }, extra = {
       actionName: name,
       listen: function() {
-        controller.stream.listen.apply(controller.stream, arguments);
+        stream.listen.apply(stream, arguments);
       }
     };
-    extend(action, extra);
-    return action;
+    return extend(action, extra);
   };
   Flux.createActions = function(spec) {
     var actions = {};
@@ -94,8 +92,9 @@
     if (!isObject(obj) && !isFunction(obj)) {
       return obj;
     }
-    for (var i = 1; i < arguments.length; ++i) {
-      var source = arguments[i];
+    var i = 0;
+    while (i < arguments.length) {
+      var source = arguments[i++];
       for (var property in source) {
         obj[property] = source[property];
       }
