@@ -10,12 +10,18 @@ Flux.createStore = function (spec) {
 }
 
 Flux.createAction = function (name) {
-	var stream = new Stream,
+	var controller = Stream.create(),
 		action = function Action(data) {
-			stream.add(data)
+			controller.add(data)
+		},
+		extra = {
+			actionName: name,
+			listen: function () {
+				controller.stream.listen.apply(controller.stream, arguments)
+			}
 		}
 
-	extend(action, stream, {actionName: name})
+	extend(action, extra)
 
 	return action
 }

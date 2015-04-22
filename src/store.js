@@ -1,21 +1,23 @@
 function Store() {
-	Stream.call(this)
+	this.controller = new Stream.create()
 }
-Store.prototype = Object.create(Stream.prototype)
-Store.prototype.constructor = Store
 
 Store.prototype.emit = function (eventType, payload) {
-	this.add({
+	this.controller.add({
 		eventType: eventType,
 		payload: payload
-	});
+	})
 }
 Store.prototype.on = function (eventType, callback) {
-	return this.filter(function (event) {
-		return event.eventType === eventType
-	}).map(function (event) {
-		return event.payload
-	}).listen(callback)
+	if (isFunction(eventType) && !callback) {
+		return this.controller.stream.listen(eventType)
+	} else {
+		return this.controller.stream.filter(function (event) {
+			return event.eventType === eventType
+		}).map(function (event) {
+			return event.payload
+		}).listen(callback)
+	}
 }
 
 Store.prototype.listenTo = function (action, handler) {

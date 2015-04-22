@@ -26,6 +26,6 @@
   },
   "dependencies": {
     "davy": "^0.3.3",
-    "streamlet": "^0.1.0"
+    "streamlet": "^0.2.0"
   }
 }
