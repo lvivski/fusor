@@ -11,14 +11,11 @@ Store.prototype.listen = function (callback) {
 }
 
 Store.prototype.listenTo = function (action, onNext, onFail) {
-	var self = this
-	return action.listen(function (value) {
-		if (isFunction(onNext)) {
-			onNext.call(self, value)
-		}
-	}, function (error) {
-		if (isFunction(onFail)) {
-			onFail.call(self, error)
-		}
-	})
+	if (isFunction(onNext)) {
+		onNext = onNext.bind(this)
+	}
+	if (isFunction(onFail)) {
+		onFail = onFail.bind(this)
+	}
+	return action.listen(onNext, onFail)
 }

@@ -1,6 +1,3 @@
-Flux.Promise = Promise
-Flux.Stream = Stream
-
 Flux.createStore = function (spec) {
 	var store = extend(new Store, spec)
 
@@ -19,14 +16,15 @@ Flux.createAction = function (name, handler) {
 	var controller = Stream.create(true),
 		stream = controller.stream,
 		action = function Action(data) {
-			new Promise(function (resolve) {
-					resolve(data)
+			return new Promise(function (resolve) {
+					resolve(handler(data))
 				})
-				.then(handler)
 				.then(function (value) {
 					controller.next(value)
+					return value
 				}, function (error) {
 					controller.fail(error)
+					throw error
 				})
 		},
 		extra = {
@@ -52,7 +50,10 @@ Flux.createActions = function (spec, parent) {
 			if (isObject(value)) {
 				var handler = value.$
 				delete value.$
-				actions[actionName] = extend(this.createAction(parentActionName, handler), this.createActions(value, parentActionName))
+				actions[actionName] = extend(
+					this.createAction(parentActionName, handler),
+					this.createActions(value, parentActionName)
+				)
 			} else {
 				actions[actionName] = this.createAction(parentActionName, value)
 			}
@@ -60,5 +61,8 @@ Flux.createActions = function (spec, parent) {
 	}
 	return actions
 }
+
+Flux.Promise = Promise
+Flux.Stream = Stream
 
 

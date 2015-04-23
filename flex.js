@@ -16,8 +16,6 @@
     Stream = global.Streamlet;
     global.Flex = Flux;
   }
-  Flux.Promise = Promise;
-  Flux.Stream = Stream;
   Flux.createStore = function(spec) {
     var store = extend(new Store(), spec);
     if (isFunction(spec.initialize)) {
@@ -32,12 +30,14 @@
       };
     }
     var controller = Stream.create(true), stream = controller.stream, action = function Action(data) {
-      new Promise(function(resolve) {
-        resolve(data);
-      }).then(handler).then(function(value) {
+      return new Promise(function(resolve) {
+        resolve(handler(data));
+      }).then(function(value) {
         controller.next(value);
+        return value;
       }, function(error) {
         controller.fail(error);
+        throw error;
       });
     }, extra = {
       actionName: name,
@@ -65,6 +65,8 @@
     }
     return actions;
   };
+  Flux.Promise = Promise;
+  Flux.Stream = Stream;
   Flux.ListenerMixin = {
     componentWillMount: function() {
       this.subscriptions = [];
@@ -89,16 +91,13 @@
     return this.controller.stream.listen(callback);
   };
   Store.prototype.listenTo = function(action, onNext, onFail) {
-    var self = this;
-    return action.listen(function(value) {
-      if (isFunction(onNext)) {
-        onNext.call(self, value);
-      }
-    }, function(error) {
-      if (isFunction(onFail)) {
-        onFail.call(self, error);
-      }
-    });
+    if (isFunction(onNext)) {
+      onNext = onNext.bind(this);
+    }
+    if (isFunction(onFail)) {
+      onFail = onFail.bind(this);
+    }
+    return action.listen(onNext, onFail);
   };
   function extend(obj) {
     if (!isObject(obj) && !isFunction(obj)) {
