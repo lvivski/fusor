@@ -2,6 +2,7 @@
   "name": "flex",
   "version": "0.1.1",
   "description": "Flexible Flux Implementation",
+  "author": "Yehor Lvivski <lvivski@gmail.com>",
   "scripts": {
     "prepublish": "make -B"
   },
@@ -15,8 +16,6 @@
     "react",
     "reactive"
   ],
-  "author": "Yehor Lvivski <lvivski@gmail.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/lvivski/flex/issues"
   },
@@ -27,5 +26,6 @@
   "dependencies": {
     "davy": "^0.3.3",
     "streamlet": "^0.2.0"
-  }
+  },
+  "license": "MIT"
 }
