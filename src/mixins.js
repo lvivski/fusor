@@ -12,9 +12,5 @@ Flux.ListenerMixin = {
 
 	listenTo: function (stream, listener) {
 		this.subscriptions.push(stream.listen(listener))
-	},
-
-	onEvent: function (stream, event, listener) {
-		this.subscriptions.push(stream.on(event, listener))
 	}
 }

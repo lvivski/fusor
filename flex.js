@@ -16,6 +16,8 @@
     Stream = global.Streamlet;
     global.Flex = Flux;
   }
+  Flux.Promise = Promise;
+  Flux.Stream = Stream;
   Flux.createStore = function(spec) {
     var store = extend(new Store(), spec);
     if (isFunction(spec.initialize)) {
@@ -23,9 +25,20 @@
     }
     return store;
   };
-  Flux.createAction = function(name) {
-    var controller = Stream.create(), stream = controller.stream, action = function Action(data) {
-      controller.add(data);
+  Flux.createAction = function(name, handler) {
+    if (!isFunction(handler)) {
+      handler = function(_) {
+        return _;
+      };
+    }
+    var controller = Stream.create(true), stream = controller.stream, action = function Action(data) {
+      new Promise(function(resolve) {
+        resolve(data);
+      }).then(handler).then(function(value) {
+        controller.next(value);
+      }, function(error) {
+        controller.fail(error);
+      });
     }, extra = {
       actionName: name,
       listen: function() {
@@ -34,12 +47,20 @@
     };
     return extend(action, extra);
   };
-  Flux.createActions = function(spec) {
+  Flux.createActions = function(spec, parent) {
+    parent || (parent = "");
     var actions = {};
     for (var action in spec) {
       if (spec.hasOwnProperty(action)) {
-        var value = spec[action], actionName = isObject(value) ? action : value;
-        actions[actionName] = isObject(value) ? this.createActions(value) : this.createAction(actionName);
+        var value = spec[action], actionName = isString(value) ? value : action;
+        var parentActionName = parent + actionName;
+        if (isObject(value)) {
+          var handler = value.$;
+          delete value.$;
+          actions[actionName] = extend(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
+        } else {
+          actions[actionName] = this.createAction(parentActionName, value);
+        }
       }
     }
     return actions;
@@ -56,37 +77,28 @@
     },
     listenTo: function(stream, listener) {
       this.subscriptions.push(stream.listen(listener));
-    },
-    onEvent: function(stream, event, listener) {
-      this.subscriptions.push(stream.on(event, listener));
     }
   };
   function Store() {
     this.controller = new Stream.create();
   }
-  Store.prototype.emit = function(eventType, payload) {
-    this.controller.add({
-      eventType: eventType,
-      payload: payload
+  Store.prototype.emit = function(data) {
+    return this.controller.add(data);
+  };
+  Store.prototype.listen = function(callback) {
+    return this.controller.stream.listen(callback);
+  };
+  Store.prototype.listenTo = function(action, onNext, onFail) {
+    var self = this;
+    return action.listen(function(value) {
+      if (isFunction(onNext)) {
+        onNext.call(self, value);
+      }
+    }, function(error) {
+      if (isFunction(onFail)) {
+        onFail.call(self, error);
+      }
     });
-  };
-  Store.prototype.on = function(eventType, callback) {
-    if (isFunction(eventType) && !callback) {
-      return this.controller.stream.listen(eventType);
-    } else {
-      return this.controller.stream.filter(function(event) {
-        return event.eventType === eventType;
-      }).map(function(event) {
-        return event.payload;
-      }).listen(callback);
-    }
-  };
-  Store.prototype.listenTo = function(action, handler) {
-    action.listen(function(store) {
-      return function(data) {
-        handler.call(store, data);
-      };
-    }(this));
   };
   function extend(obj) {
     if (!isObject(obj) && !isFunction(obj)) {

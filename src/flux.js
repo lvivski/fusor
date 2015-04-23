@@ -1,3 +1,6 @@
+Flux.Promise = Promise
+Flux.Stream = Stream
+
 Flux.createStore = function (spec) {
 	var store = extend(new Store, spec)
 
@@ -8,11 +11,23 @@ Flux.createStore = function (spec) {
 	return store
 }
 
-Flux.createAction = function (name) {
-	var controller = Stream.create(),
+Flux.createAction = function (name, handler) {
+	if (!isFunction(handler)) {
+		handler = function (_) {return _}
+	}
+
+	var controller = Stream.create(true),
 		stream = controller.stream,
 		action = function Action(data) {
-			controller.add(data)
+			new Promise(function (resolve) {
+					resolve(data)
+				})
+				.then(handler)
+				.then(function (value) {
+					controller.next(value)
+				}, function (error) {
+					controller.fail(error)
+				})
 		},
 		extra = {
 			actionName: name,
@@ -24,16 +39,23 @@ Flux.createAction = function (name) {
 	return extend(action, extra)
 }
 
-Flux.createActions = function (spec) {
+Flux.createActions = function (spec, parent) {
+	parent || (parent = '')
 	var actions = {}
 	for (var action in spec) {
 		if (spec.hasOwnProperty(action)) {
 			var value = spec[action],
-				actionName = isObject(value) ? action : value
+				actionName = isString(value) ? value : action
 
-			actions[actionName] = isObject(value) ?
-				this.createActions(value) :
-				this.createAction(actionName)
+			var parentActionName = parent + actionName
+
+			if (isObject(value)) {
+				var handler = value.$
+				delete value.$
+				actions[actionName] = extend(this.createAction(parentActionName, handler), this.createActions(value, parentActionName))
+			} else {
+				actions[actionName] = this.createAction(parentActionName, value)
+			}
 		}
 	}
 	return actions
