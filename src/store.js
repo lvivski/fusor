@@ -1,5 +1,5 @@
 function Store() {
-	this.controller = new Stream.create()
+	this.controller = Stream.create(this)
 }
 
 Store.prototype.emit = function (data) {
