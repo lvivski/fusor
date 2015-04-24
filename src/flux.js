@@ -40,7 +40,7 @@ Flux.createAction = function (name, handler) {
 Flux.createActions = function (spec, parent) {
 	parent || (parent = '')
 	var actions = {}
-	for (var action in spec) {
+	for (var action in spec) if (spec.hasOwnProperty(action)) {
 		var value = spec[action],
 			actionName = isString(value) ? value : action
 

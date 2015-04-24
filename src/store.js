@@ -6,7 +6,7 @@ function Store() {
 }
 
 Store.prototype.getInitialState = function () {
-	return Object.create(this.initialState)
+	return JSON.parse(JSON.stringify(this.initialState))
 }
 
 Store.prototype.get =
@@ -17,7 +17,7 @@ Store.prototype.getState = function () {
 Store.prototype.set =
 Store.prototype.setState = function (state) {
 	if (!isObject(state)) return
-	for (var key in state) {
+	for (var key in state) if (state.hasOwnProperty(key)) {
 		this.__state__[key] = state[key]
 	}
 	this.controller.add(state)

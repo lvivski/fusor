@@ -51,7 +51,7 @@
   Flux.createActions = function(spec, parent) {
     parent || (parent = "");
     var actions = {};
-    for (var action in spec) {
+    for (var action in spec) if (spec.hasOwnProperty(action)) {
       var value = spec[action], actionName = isString(value) ? value : action;
       var parentActionName = parent + actionName;
       if (isObject(value)) {
@@ -94,14 +94,14 @@
     this.set(this.getInitialState());
   }
   Store.prototype.getInitialState = function() {
-    return Object.create(this.initialState);
+    return JSON.parse(JSON.stringify(this.initialState));
   };
   Store.prototype.get = Store.prototype.getState = function() {
     return this.__state__;
   };
   Store.prototype.set = Store.prototype.setState = function(state) {
     if (!isObject(state)) return;
-    for (var key in state) {
+    for (var key in state) if (state.hasOwnProperty(key)) {
       this.__state__[key] = state[key];
     }
     this.controller.add(state);
@@ -127,11 +127,16 @@
     if (!isObject(obj) && !isFunction(obj)) {
       return obj;
     }
-    var i = 0;
+    var i = 1;
     while (i < arguments.length) {
       var source = arguments[i++];
       for (var property in source) {
-        obj[property] = source[property];
+        if (Object.getOwnPropertyDescriptor && Object.defineProperty) {
+          var propertyDescriptor = Object.getOwnPropertyDescriptor(source, property);
+          Object.defineProperty(obj, property, propertyDescriptor || {});
+        } else {
+          obj[property] = source[property];
+        }
       }
     }
     return obj;
