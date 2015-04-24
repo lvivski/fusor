@@ -22,11 +22,11 @@ Flexible Flux implementation
 
 * `.listen(onData)`
 
-* `.listenTo(action[, onSuccess, onFail])`
-
 * `.initialize()`
 
-* `.on<EventName>()` & `.on<EventName>Fail()` 
+* `.listenTo(action[, onSuccess, onFail])`
+
+* `.on<ActionName>()` & `.on<ActionName>Fail()` 
 
 ####`Flex.ListenerMixin`
 * `.listenTo(store, onData)`
