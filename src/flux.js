@@ -62,7 +62,16 @@ Flux.createActions = function (spec, parent) {
 	return actions
 }
 
+Flux.saveState = function (store) {
+	return JSON.stringify(store.state)
+}
+
+Flux.restoreState = function (store, state) {
+	store.emit(isObject(state) ? state : JSON.parse(state))
+}
+
 Flux.Promise = Promise
 Flux.Stream = Stream
+Flux.Store = Store
 
 

@@ -1,9 +1,13 @@
 function Store() {
 	this.controller = Stream.create(this)
+	this.state = {}
 }
 
-Store.prototype.emit = function (data) {
-	return this.controller.add(data)
+Store.prototype.emit = function (state) {
+	for (var key in state) if (state.hasOwnProperty(key)) {
+		this.state[key] = state[key]
+	}
+	return this.controller.add(state)
 }
 
 Store.prototype.listen = function (callback) {

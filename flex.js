@@ -65,8 +65,15 @@
     }
     return actions;
   };
+  Flux.saveState = function(store) {
+    return JSON.stringify(obj.state);
+  };
+  Flux.restoreState = function(store, state) {
+    store.emit(isObject(state) ? state : JSON.parse(state));
+  };
   Flux.Promise = Promise;
   Flux.Stream = Stream;
+  Flux.Store = Store;
   Flux.ListenerMixin = {
     componentWillMount: function() {
       this.subscriptions = [];
@@ -83,9 +90,13 @@
   };
   function Store() {
     this.controller = Stream.create(this);
+    this.state = {};
   }
-  Store.prototype.emit = function(data) {
-    return this.controller.add(data);
+  Store.prototype.emit = function(state) {
+    for (var key in state) if (state.hasOwnProperty(key)) {
+      this.state[key] = state[key];
+    }
+    return this.controller.add(state);
   };
   Store.prototype.listen = function(callback) {
     return this.controller.stream.listen(callback);
