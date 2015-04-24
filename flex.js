@@ -115,13 +115,18 @@
     return this.controller.stream.listen(callback);
   };
   Store.prototype.listenTo = function(action, onNext, onFail) {
-    if (isFunction(onNext)) {
-      onNext = onNext.bind(this);
+    if (isFunction(action) && isString(action.actionName)) {
+      onNext = onNext || this["on" + action.actionName];
+      onFail = onFail || this["on" + action.actionName + "Fail"];
+      if (isFunction(onNext) || isFunction(onFail)) {
+        action.listen(onNext && onNext.bind(this), onFail && onFail.bind(this));
+      }
     }
-    if (isFunction(onFail)) {
-      onFail = onFail.bind(this);
+    if (arguments.length === 1 && (isFunction(action) || isObject(action))) {
+      for (var key in action) if (action.hasOwnProperty(key)) {
+        this.listenTo(action[key]);
+      }
     }
-    return action.listen(onNext, onFail);
   };
   function extend(obj) {
     if (!isObject(obj) && !isFunction(obj)) {
