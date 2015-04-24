@@ -1,26 +1,33 @@
 function Store() {
 	this.controller = Stream.create(this)
-	this.state = {}
+	this.initialState = {}
+	this.__state__ = {}
+	this.set(this.getInitialState())
+}
+
+Store.prototype.getInitialState = function () {
+	return Object.create(this.initialState)
 }
 
 Store.prototype.get =
 Store.prototype.getState = function () {
-	return this.state
+	return this.__state__
 }
 
-Store.prototype.emit =
 Store.prototype.set =
 Store.prototype.setState = function (state) {
-	for (var key in state) if (state.hasOwnProperty(key)) {
-		this.state[key] = state[key]
+	if (!isObject(state)) return
+	for (var key in state) {
+		this.__state__[key] = state[key]
 	}
-	return this.controller.add(state)
+	this.controller.add(state)
+	return this.__state__
 }
 
-Store.prototype.clear =
-Store.prototype.clearState = function () {
-	this.state = {}
-	return this.controller.add(this.state)
+Store.prototype.reset =
+Store.prototype.resetState = function () {
+	this.__state__ = {}
+	return this.set(this.getInitialState())
 }
 
 Store.prototype.listen = function (callback) {

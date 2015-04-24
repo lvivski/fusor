@@ -18,6 +18,7 @@
   }
   Flux.createStore = function(spec) {
     var store = extend(new Store(), spec);
+    store.set(store.getInitialState());
     if (isFunction(spec.initialize)) {
       spec.initialize.call(store);
     }
@@ -51,25 +52,23 @@
     parent || (parent = "");
     var actions = {};
     for (var action in spec) {
-      if (spec.hasOwnProperty(action)) {
-        var value = spec[action], actionName = isString(value) ? value : action;
-        var parentActionName = parent + actionName;
-        if (isObject(value)) {
-          var handler = value.$;
-          delete value.$;
-          actions[actionName] = extend(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
-        } else {
-          actions[actionName] = this.createAction(parentActionName, value);
-        }
+      var value = spec[action], actionName = isString(value) ? value : action;
+      var parentActionName = parent + actionName;
+      if (isObject(value)) {
+        var handler = value.$;
+        delete value.$;
+        actions[actionName] = extend(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
+      } else {
+        actions[actionName] = this.createAction(parentActionName, value);
       }
     }
     return actions;
   };
-  Flux.saveState = function(store) {
-    return JSON.stringify(store.state);
+  Flux.save = Flux.saveState = function(store) {
+    return JSON.stringify(store.get());
   };
-  Flux.restoreState = function(store, state) {
-    store.emit(isObject(state) ? state : JSON.parse(state));
+  Flux.restore = Flux.restoreState = function(store, state) {
+    store.set(isObject(state) ? state : JSON.parse(state));
   };
   Flux.Promise = Promise;
   Flux.Stream = Stream;
@@ -90,20 +89,27 @@
   };
   function Store() {
     this.controller = Stream.create(this);
-    this.state = {};
+    this.initialState = {};
+    this.__state__ = {};
+    this.set(this.getInitialState());
   }
+  Store.prototype.getInitialState = function() {
+    return Object.create(this.initialState);
+  };
   Store.prototype.get = Store.prototype.getState = function() {
-    return this.state;
+    return this.__state__;
   };
-  Store.prototype.emit = Store.prototype.set = Store.prototype.setState = function(state) {
-    for (var key in state) if (state.hasOwnProperty(key)) {
-      this.state[key] = state[key];
+  Store.prototype.set = Store.prototype.setState = function(state) {
+    if (!isObject(state)) return;
+    for (var key in state) {
+      this.__state__[key] = state[key];
     }
-    return this.controller.add(state);
+    this.controller.add(state);
+    return this.__state__;
   };
-  Store.prototype.clear = Store.prototype.clearState = function() {
-    this.state = {};
-    return this.controller.add(this.state);
+  Store.prototype.reset = Store.prototype.resetState = function() {
+    this.__state__ = {};
+    return this.set(this.getInitialState());
   };
   Store.prototype.listen = function(callback) {
     return this.controller.stream.listen(callback);
