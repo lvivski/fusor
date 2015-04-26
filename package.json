@@ -1,6 +1,6 @@
 {
   "name": "flex",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Flexible Flux Implementation",
   "author": "Yehor Lvivski <lvivski@gmail.com>",
   "scripts": {
@@ -12,14 +12,11 @@
   },
   "keywords": [
     "flux",
-    "flex",
     "react",
-    "reactive"
+    "reactive",
+    "isomorphic",
+    "flexible"
   ],
-  "bugs": {
-    "url": "https://github.com/lvivski/flex/issues"
-  },
-  "homepage": "https://github.com/lvivski/flex",
   "devDependencies": {
     "uglify-js": "^2.4.19"
   },

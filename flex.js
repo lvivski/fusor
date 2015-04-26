@@ -1,19 +1,19 @@
 (function(global) {
   "use strict";
-  var Promise, Stream, Flux = {};
+  var Promise, Observable, Flux = {};
   if (typeof define === "function" && define.amd) {
     define([ "davy", "streamlet" ], function(davy, streamlet) {
       Promise = davy;
-      Stream = streamlet;
+      Observable = streamlet;
       return Flux;
     });
   } else if (typeof module === "object" && module.exports) {
     Promise = require("davy");
-    Stream = require("streamlet");
+    Observable = require("streamlet");
     module.exports = Flux;
   } else {
     Promise = global.Davy;
-    Stream = global.Streamlet;
+    Observable = global.Streamlet;
     global.Flex = Flux;
   }
   Flux.createStore = function(spec) {
@@ -30,15 +30,21 @@
         return _;
       };
     }
-    var controller = Stream.create(true), stream = controller.stream, action = function Action(data) {
+    var controller = Observable.controlSync(), stream = controller.stream, action = function Action(data) {
       return new Promise(function(resolve) {
         resolve(handler(data));
       }).then(function(value) {
-        controller.next(value);
-        return value;
+        cb();
+        return cb;
+        function cb() {
+          controller.next(value);
+        }
       }, function(error) {
-        controller.fail(error);
-        throw error;
+        cb();
+        return cb;
+        function cb() {
+          controller.fail(error);
+        }
       });
     }, extra = {
       actionName: name,
@@ -71,7 +77,7 @@
     store.set(isObject(state) ? state : JSON.parse(state));
   };
   Flux.Promise = Promise;
-  Flux.Stream = Stream;
+  Flux.Observable = Observable;
   Flux.Store = Store;
   Flux.ListenerMixin = {
     componentWillMount: function() {
@@ -88,7 +94,7 @@
     }
   };
   function Store() {
-    this.controller = Stream.create(this);
+    this.controller = Observable.controlSync();
     this.initialState = {};
     this.__state__ = {};
     this.set(this.getInitialState());

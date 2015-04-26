@@ -1,5 +1,5 @@
 function Store() {
-	this.controller = Stream.create(this)
+	this.controller = Observable.controlSync()
 	this.initialState = {}
 	this.__state__ = {}
 	this.set(this.getInitialState())

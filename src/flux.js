@@ -13,18 +13,24 @@ Flux.createAction = function (name, handler) {
 		handler = function (_) {return _}
 	}
 
-	var controller = Stream.create(true),
+	var controller = Observable.controlSync(),
 		stream = controller.stream,
 		action = function Action(data) {
 			return new Promise(function (resolve) {
 					resolve(handler(data))
 				})
 				.then(function (value) {
-					controller.next(value)
-					return value
+					cb()
+					return cb
+					function cb() {
+						controller.next(value)
+					}
 				}, function (error) {
-					controller.fail(error)
-					throw error
+					cb()
+					return cb
+					function cb() {
+						controller.fail(error)
+					}
 				})
 		},
 		extra = {
@@ -71,7 +77,7 @@ Flux.restoreState = function (store, state) {
 }
 
 Flux.Promise = Promise
-Flux.Stream = Stream
+Flux.Observable = Observable
 Flux.Store = Store
 
 
