@@ -34,15 +34,15 @@
       return new Promise(function(resolve) {
         resolve(handler(data));
       }).then(function(value) {
-        cb();
-        return cb;
-        function cb() {
+        next();
+        return next;
+        function next() {
           controller.next(value);
         }
       }, function(error) {
-        cb();
-        return cb;
-        function cb() {
+        fail();
+        return fail;
+        function fail() {
           controller.fail(error);
         }
       });
