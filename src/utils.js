@@ -28,3 +28,11 @@ function isFunction(fn) {
 function isString(str) {
 	return str && typeof str === 'string'
 }
+
+function wrap(fn) {
+	return function (value) {
+		return function () {
+			return fn(value)
+		}
+	}
+}

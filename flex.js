@@ -30,22 +30,16 @@
         return _;
       };
     }
-    var controller = Observable.controlSync(), stream = controller.stream, action = function Action(data) {
+    var controller = Observable.controlSync(), stream = controller.stream, next = function(value) {
+      controller.next(value);
+      return value;
+    }, fail = function(error) {
+      controller.fail(error);
+      throw error;
+    }, action = function Action(data) {
       return new Promise(function(resolve) {
         resolve(handler(data));
-      }).then(function(value) {
-        next();
-        return next;
-        function next() {
-          controller.next(value);
-        }
-      }, function(error) {
-        fail();
-        return fail;
-        function fail() {
-          controller.fail(error);
-        }
-      });
+      }).then(next, fail).then(wrap(next), wrap(fail));
     }, extra = {
       actionName: name,
       listen: function() {
@@ -160,5 +154,12 @@
   }
   function isString(str) {
     return str && typeof str === "string";
+  }
+  function wrap(fn) {
+    return function(value) {
+      return function() {
+        return fn(value);
+      };
+    };
   }
 })(this);
