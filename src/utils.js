@@ -5,7 +5,7 @@ function extend(obj) {
 	var i = 1
 	while (i < arguments.length) {
 		var source = arguments[i++]
-		for (var property in source) {
+		for (var property in source) if (source.hasOwnProperty(property)) {
 			if (Object.getOwnPropertyDescriptor && Object.defineProperty) {
 				var propertyDescriptor = Object.getOwnPropertyDescriptor(source, property)
 				Object.defineProperty(obj, property, propertyDescriptor || {})

@@ -1,9 +1,17 @@
 Flux.createStore = function (spec) {
-	var store = extend(new Store, spec)
-	store.set(store.getInitialState())
+	var store
+	if (typeof spec !== 'object') {
+		if (!(spec.prototype instanceof Store)) {
+			throw new TypeError('Store should have Flex.Store in prototype chain')
+		}
+		store = new spec
+	} else {
+		store = extend(new Store, spec)
+		store.set(store.getInitialState())
 
-	if (isFunction(spec.initialize)) {
-		spec.initialize.call(store)
+		if (isFunction(spec.initialize)) {
+			spec.initialize.call(store)
+		}
 	}
 	return store
 }

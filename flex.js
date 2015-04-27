@@ -17,10 +17,18 @@
     global.Flex = Flux;
   }
   Flux.createStore = function(spec) {
-    var store = extend(new Store(), spec);
-    store.set(store.getInitialState());
-    if (isFunction(spec.initialize)) {
-      spec.initialize.call(store);
+    var store;
+    if (typeof spec !== "object") {
+      if (!(spec.prototype instanceof Store)) {
+        throw new TypeError("Store should have Flex.Store in prototype chain");
+      }
+      store = new spec();
+    } else {
+      store = extend(new Store(), spec);
+      store.set(store.getInitialState());
+      if (isFunction(spec.initialize)) {
+        spec.initialize.call(store);
+      }
     }
     return store;
   };
@@ -135,7 +143,7 @@
     var i = 1;
     while (i < arguments.length) {
       var source = arguments[i++];
-      for (var property in source) {
+      for (var property in source) if (source.hasOwnProperty(property)) {
         if (Object.getOwnPropertyDescriptor && Object.defineProperty) {
           var propertyDescriptor = Object.getOwnPropertyDescriptor(source, property);
           Object.defineProperty(obj, property, propertyDescriptor || {});
