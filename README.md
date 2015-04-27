@@ -5,7 +5,7 @@ Flexible Flux implementation
 ##API
 
 ####`Flex.createAction(name[, fn])` 
-Creates a new Action. Returns an _Observable/Function_.
+Creates a new _Action_. Returns an _Observable/Function_.
 
 * `.listen(onSuccess, onFail)` Subscribe to an _Action_. Returns a function, that will unsubscribe you, once called. `onSuccess` or `onFail` callback will be called depending on the _Action_ result. 
 
@@ -35,6 +35,8 @@ Creates a new _Store_. Returns a `Flex.Store` object.
 * `initialState` property will be used a _Store_'s initial state.
 
 ####`Flex.Store`
+Store constructor
+
 * `.getInitialState()` Returns _Store_ initial state
 
 * `.getState()` & `.get()` Returns current state
@@ -47,7 +49,7 @@ Creates a new _Store_. Returns a `Flex.Store` object.
 
 * `.listenTo(action[, onSuccess, onFail])` Subscribes _Store_ to _`action`_ calls. Optional `onSuccess` and `onFail` methods may be used.
 
-* `.on<`_`ActionName`_`>()` & `.on<`_`ActionName`_`>Fail()` If no callbacks provided in `.listenTo()` method, appropriate _Store_ methods will be used as callbacks.
+* `.on<`_`ActionName`_`>()` & `.on<`_`ActionName`_`>Fail()` If no callbacks provided to `.listenTo()` method, appropriate _Store_ methods will be used as callbacks.
 `ActionName` is formed as (_ParentName_ + _ChildName_): `Parent`, `ParentChild`, `Parent2Child3` etc.
 
 
