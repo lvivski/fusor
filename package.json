@@ -1,6 +1,6 @@
 {
   "name": "flex",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Flexible Flux Implementation",
   "author": "Yehor Lvivski <lvivski@gmail.com>",
   "scripts": {

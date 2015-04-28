@@ -95,41 +95,30 @@
       this.subscriptions.push(stream.listen(listener));
     }
   };
-  var STATE = "__state" + Math.random() + "__", CONTROLLER = "__controller" + Math.random() + "__";
   function Store() {
     this.initialState || (this.initialState = {});
-    this[CONTROLLER] = Observable.controlSync();
-    this[STATE] = {};
+    this.__controller__ = Observable.controlSync();
+    this.__state__ = {};
     this.set(this.getInitialState());
   }
-  Object.defineProperty(Observable.prototype, STATE, {
-    configurable: true,
-    writable: true,
-    value: undefined
-  });
-  Object.defineProperty(Observable.prototype, CONTROLLER, {
-    configurable: true,
-    writable: true,
-    value: undefined
-  });
   Store.prototype.getInitialState = function() {
     return JSON.parse(JSON.stringify(this.initialState || {}));
   };
   Store.prototype.get = Store.prototype.getState = function() {
-    return this[STATE];
+    return this.__state__;
   };
   Store.prototype.set = Store.prototype.setState = function(state) {
     if (!isObject(state)) return;
-    extend(this[STATE], state);
-    this[CONTROLLER].add(state);
-    return this[STATE];
+    extend(this.__state__, state);
+    this.__controller__.add(state);
+    return this.__state__;
   };
   Store.prototype.reset = Store.prototype.resetState = function() {
-    this[STATE] = {};
+    this.__state__ = {};
     return this.set(this.getInitialState());
   };
   Store.prototype.listen = function(callback) {
-    return this[CONTROLLER].stream.listen(callback);
+    return this.__controller__.stream.listen(callback);
   };
   Store.prototype.listenTo = function(action, onNext, onFail) {
     if (isFunction(action) && isString(action.actionName)) {
