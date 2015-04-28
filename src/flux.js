@@ -1,18 +1,14 @@
-Flux.createStore = function (spec) {
-	var store
-	if (typeof spec !== 'object') {
-		if (!(spec.prototype instanceof Store)) {
-			throw new TypeError('Store should have Flex.Store in prototype chain')
-		}
-		store = new spec
+Flux.createStore = function (store) {
+	if (isFunction(store)) {
+		extend(store.prototype, Store.prototype)
+		store = new store
 	} else {
-		store = extend(new Store, spec)
-		store.set(store.getInitialState())
-
-		if (isFunction(spec.initialize)) {
-			spec.initialize.call(store)
+		store = extend(new Store, store)
+		if (isFunction(store.initialize)) {
+			store.initialize.call(store)
 		}
 	}
+	Store.call(store)
 	return store
 }
 
@@ -20,7 +16,6 @@ Flux.createAction = function (name, handler) {
 	if (!isFunction(handler)) {
 		handler = function (_) {return _}
 	}
-
 	var controller = Observable.controlSync(),
 		stream = controller.stream,
 		next = function (value) {
@@ -44,13 +39,15 @@ Flux.createAction = function (name, handler) {
 				stream.listen.apply(stream, arguments)
 			}
 		}
-
 	return extend(action, extra)
 }
 
 Flux.createActions = function (spec, parent) {
 	parent || (parent = '')
 	var actions = {}
+	if (isFunction(spec)) {
+		spec = new spec
+	}
 	for (var action in spec) if (spec.hasOwnProperty(action)) {
 		var value = spec[action],
 			actionName = isString(value) ? value : action
@@ -84,5 +81,4 @@ Flux.restoreState = function (store, state) {
 Flux.Promise = Promise
 Flux.Observable = Observable
 Flux.Store = Store
-
 

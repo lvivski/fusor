@@ -4,7 +4,7 @@ FILES = \
 	src/flux.js \
 	src/mixins.js \
 	src/store.js \
-	src/utils.js \
+	src/util.js \
 
 all: \
 	flex.js \

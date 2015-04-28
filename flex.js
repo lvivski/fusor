@@ -16,20 +16,17 @@
     Observable = global.Streamlet;
     global.Flex = Flux;
   }
-  Flux.createStore = function(spec) {
-    var store;
-    if (typeof spec !== "object") {
-      if (!(spec.prototype instanceof Store)) {
-        throw new TypeError("Store should have Flex.Store in prototype chain");
-      }
-      store = new spec();
+  Flux.createStore = function(store) {
+    if (isFunction(store)) {
+      extend(store.prototype, Store.prototype);
+      store = new store();
     } else {
-      store = extend(new Store(), spec);
-      store.set(store.getInitialState());
-      if (isFunction(spec.initialize)) {
-        spec.initialize.call(store);
+      store = extend(new Store(), store);
+      if (isFunction(store.initialize)) {
+        store.initialize.call(store);
       }
     }
+    Store.call(store);
     return store;
   };
   Flux.createAction = function(name, handler) {
@@ -59,6 +56,9 @@
   Flux.createActions = function(spec, parent) {
     parent || (parent = "");
     var actions = {};
+    if (isFunction(spec)) {
+      spec = new spec();
+    }
     for (var action in spec) if (spec.hasOwnProperty(action)) {
       var value = spec[action], actionName = isString(value) ? value : action;
       var parentActionName = parent + actionName;
@@ -95,37 +95,48 @@
       this.subscriptions.push(stream.listen(listener));
     }
   };
+  var STATE = "__state" + Math.random() + "__", CONTROLLER = "__controller" + Math.random() + "__";
   function Store() {
-    this.controller = Observable.controlSync();
-    this.initialState = {};
-    this.__state__ = {};
+    this.initialState || (this.initialState = {});
+    this[CONTROLLER] = Observable.controlSync();
+    this[STATE] = {};
     this.set(this.getInitialState());
   }
+  Object.defineProperty(Observable.prototype, STATE, {
+    configurable: true,
+    writable: true,
+    value: undefined
+  });
+  Object.defineProperty(Observable.prototype, CONTROLLER, {
+    configurable: true,
+    writable: true,
+    value: undefined
+  });
   Store.prototype.getInitialState = function() {
-    return JSON.parse(JSON.stringify(this.initialState));
+    return JSON.parse(JSON.stringify(this.initialState || {}));
   };
   Store.prototype.get = Store.prototype.getState = function() {
-    return this.__state__;
+    return this[STATE];
   };
   Store.prototype.set = Store.prototype.setState = function(state) {
     if (!isObject(state)) return;
-    for (var key in state) if (state.hasOwnProperty(key)) {
-      this.__state__[key] = state[key];
-    }
-    this.controller.add(state);
-    return this.__state__;
+    extend(this[STATE], state);
+    this[CONTROLLER].add(state);
+    return this[STATE];
   };
   Store.prototype.reset = Store.prototype.resetState = function() {
-    this.__state__ = {};
+    this[STATE] = {};
     return this.set(this.getInitialState());
   };
   Store.prototype.listen = function(callback) {
-    return this.controller.stream.listen(callback);
+    return this[CONTROLLER].stream.listen(callback);
   };
   Store.prototype.listenTo = function(action, onNext, onFail) {
     if (isFunction(action) && isString(action.actionName)) {
-      onNext = onNext || this["on" + action.actionName];
-      onFail = onFail || this["on" + action.actionName + "Fail"];
+      var actionName = action.actionName;
+      actionName = actionName[0].toUpperCase() + actionName.slice(1);
+      onNext = onNext || this["on" + actionName];
+      onFail = onFail || this["on" + actionName + "Fail"];
       if (isFunction(onNext) || isFunction(onFail)) {
         action.listen(onNext && onNext.bind(this), onFail && onFail.bind(this));
       }

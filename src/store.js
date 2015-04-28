@@ -1,43 +1,58 @@
+var STATE = '__state' + Math.random() + '__',
+	CONTROLLER = '__controller' + Math.random() + '__'
+
 function Store() {
-	this.controller = Observable.controlSync()
-	this.initialState = {}
-	this.__state__ = {}
+	this.initialState || (this.initialState = {})
+	this[CONTROLLER] = Observable.controlSync()
+	this[STATE] = {}
 	this.set(this.getInitialState())
 }
 
+Object.defineProperty(Observable.prototype, STATE, {
+	configurable: true,
+	writable: true,
+	value: undefined
+})
+
+Object.defineProperty(Observable.prototype, CONTROLLER, {
+	configurable: true,
+	writable: true,
+	value: undefined
+})
+
 Store.prototype.getInitialState = function () {
-	return JSON.parse(JSON.stringify(this.initialState))
+	return JSON.parse(JSON.stringify(this.initialState || {}))
 }
 
 Store.prototype.get =
 Store.prototype.getState = function () {
-	return this.__state__
+	return this[STATE]
 }
 
 Store.prototype.set =
 Store.prototype.setState = function (state) {
 	if (!isObject(state)) return
-	for (var key in state) if (state.hasOwnProperty(key)) {
-		this.__state__[key] = state[key]
-	}
-	this.controller.add(state)
-	return this.__state__
+	extend(this[STATE], state)
+	this[CONTROLLER].add(state)
+	return this[STATE]
 }
 
 Store.prototype.reset =
 Store.prototype.resetState = function () {
-	this.__state__ = {}
+	this[STATE] = {}
 	return this.set(this.getInitialState())
 }
 
 Store.prototype.listen = function (callback) {
-	return this.controller.stream.listen(callback)
+	return this[CONTROLLER].stream.listen(callback)
 }
 
 Store.prototype.listenTo = function (action, onNext, onFail) {
 	if (isFunction(action) && isString(action.actionName)) {
-		onNext = onNext || this['on' + action.actionName]
-		onFail = onFail || this['on' + action.actionName + 'Fail']
+		var actionName = action.actionName
+		actionName = actionName[0].toUpperCase() + actionName.slice(1)
+		onNext = onNext || this['on' + actionName]
+		onFail = onFail || this['on' + actionName + 'Fail']
 
 		if (isFunction(onNext) || isFunction(onFail)) {
 			action.listen(
