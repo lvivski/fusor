@@ -18,10 +18,10 @@
   }
   Flux.createStore = function(store) {
     if (isFunction(store)) {
-      extend(store.prototype, Store.prototype);
+      assign(store.prototype, Store.prototype);
       store = new store();
     } else {
-      store = extend(new Store(), store);
+      store = assign(new Store(), store);
       if (isFunction(store.initialize)) {
         store.initialize.call(store);
       }
@@ -44,14 +44,15 @@
     }, action = function Action(data) {
       return new Promise(function(resolve) {
         resolve(handler(data));
-      }).then(next, fail).then(wrap(next), wrap(fail));
+      }).then(next, fail);
     }, extra = {
       actionName: name,
       listen: function() {
         stream.listen.apply(stream, arguments);
-      }
+      },
+      push: next
     };
-    return extend(action, extra);
+    return assign(action, extra);
   };
   Flux.createActions = function(spec, parent) {
     parent || (parent = "");
@@ -65,7 +66,7 @@
       if (isObject(value)) {
         var handler = value.$;
         delete value.$;
-        actions[actionName] = extend(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
+        actions[actionName] = assign(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
       } else {
         actions[actionName] = this.createAction(parentActionName, value);
       }
@@ -109,7 +110,7 @@
   };
   Store.prototype.set = Store.prototype.setState = function(state) {
     if (!isObject(state)) return;
-    extend(this.__state__, state);
+    assign(this.__state__, state);
     this.__controller__.add(state);
     return this.__state__;
   };
@@ -136,7 +137,7 @@
       }
     }
   };
-  function extend(obj) {
+  function assign(obj) {
     if (!isObject(obj) && !isFunction(obj)) {
       return obj;
     }
@@ -154,6 +155,17 @@
     }
     return obj;
   }
+  function extend(child, parent) {
+    child.prototype = Object.create(parent.prototype, {
+      constructor: {
+        value: child,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    child.__proto__ = parent;
+  }
   function isObject(obj) {
     return obj && typeof obj === "object";
   }
@@ -162,12 +174,5 @@
   }
   function isString(str) {
     return str && typeof str === "string";
-  }
-  function wrap(fn) {
-    return function(value) {
-      return function() {
-        return fn(value);
-      };
-    };
   }
 })(this);

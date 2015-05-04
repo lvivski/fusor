@@ -17,7 +17,7 @@ Store.prototype.getState = function () {
 Store.prototype.set =
 Store.prototype.setState = function (state) {
 	if (!isObject(state)) return
-	extend(this.__state__, state)
+	assign(this.__state__, state)
 	this.__controller__.add(state)
 	return this.__state__
 }

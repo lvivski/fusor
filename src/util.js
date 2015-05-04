@@ -1,4 +1,4 @@
-function extend(obj) {
+function assign(obj) {
 	if (!isObject(obj) && !isFunction(obj)) {
 		return obj
 	}
@@ -17,6 +17,18 @@ function extend(obj) {
 	return obj
 }
 
+function extend(child, parent) {
+	child.prototype = Object.create(parent.prototype, {
+		constructor: {
+			value: child,
+			enumerable: false,
+			writable: true,
+			configurable: true
+		}
+	})
+	child.__proto__ = parent
+}
+
 function isObject(obj) {
 	return obj && typeof obj === 'object'
 }
@@ -27,12 +39,4 @@ function isFunction(fn) {
 
 function isString(str) {
 	return str && typeof str === 'string'
-}
-
-function wrap(fn) {
-	return function (value) {
-		return function () {
-			return fn(value)
-		}
-	}
 }

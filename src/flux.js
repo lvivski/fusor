@@ -1,9 +1,9 @@
 Flux.createStore = function (store) {
 	if (isFunction(store)) {
-		extend(store.prototype, Store.prototype)
+		assign(store.prototype, Store.prototype)
 		store = new store
 	} else {
-		store = extend(new Store, store)
+		store = assign(new Store, store)
 		if (isFunction(store.initialize)) {
 			store.initialize.call(store)
 		}
@@ -31,15 +31,15 @@ Flux.createAction = function (name, handler) {
 					resolve(handler(data))
 				})
 				.then(next, fail)
-				.then(wrap(next), wrap(fail))
 		},
 		extra = {
 			actionName: name,
 			listen: function () {
 				stream.listen.apply(stream, arguments)
-			}
+			},
+			push: next
 		}
-	return extend(action, extra)
+	return assign(action, extra)
 }
 
 Flux.createActions = function (spec, parent) {
@@ -57,7 +57,7 @@ Flux.createActions = function (spec, parent) {
 		if (isObject(value)) {
 			var handler = value.$
 			delete value.$
-			actions[actionName] = extend(
+			actions[actionName] = assign(
 				this.createAction(parentActionName, handler),
 				this.createActions(value, parentActionName)
 			)
