@@ -47,10 +47,10 @@
       }).then(next, fail);
     }, extra = {
       actionName: name,
-      listen: function() {
-        stream.listen.apply(stream, arguments);
+      listen: function(onNext, onFail) {
+        return stream.listen(onNext, onFail);
       },
-      push: next
+      set: next
     };
     return assign(action, extra);
   };
