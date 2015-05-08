@@ -26,9 +26,11 @@ Flux.createAction = function (name, handler) {
 			controller.fail(error)
 			throw error
 		},
-		action = function Action(data) {
+		action = function Action() {
+			var args = arguments,
+				ctx = this
 			return new Promise(function (resolve) {
-					resolve(handler(data))
+					resolve(handler.apply(ctx, args))
 				})
 				.then(next, fail)
 		},
@@ -46,23 +48,25 @@ Flux.createActions = function (spec, parent) {
 	parent || (parent = '')
 	var actions = {}
 	if (isFunction(spec)) {
-		spec = new spec
-	}
-	for (var action in spec) if (spec.hasOwnProperty(action)) {
-		var value = spec[action],
-			actionName = isString(value) ? value : action
+		assign(spec.prototype, Actions.prototype)
+		actions = new spec
+	} else {
+		for (var action in spec) if (spec.hasOwnProperty(action)) {
+			var value = spec[action],
+				actionName = isString(value) ? value : action
 
-		var parentActionName = parent + actionName
+			var parentActionName = parent + actionName
 
-		if (isObject(value)) {
-			var handler = value.$
-			delete value.$
-			actions[actionName] = assign(
-				this.createAction(parentActionName, handler),
-				this.createActions(value, parentActionName)
-			)
-		} else {
-			actions[actionName] = this.createAction(parentActionName, value)
+			if (isObject(value)) {
+				var handler = value.$
+				delete value.$
+				actions[actionName] = assign(
+					this.createAction(parentActionName, handler),
+					this.createActions(value, parentActionName)
+				)
+			} else {
+				actions[actionName] = this.createAction(parentActionName, value)
+			}
 		}
 	}
 	return actions
@@ -81,4 +85,5 @@ Flux.restoreState = function (store, state) {
 Flux.Promise = Promise
 Flux.Observable = Observable
 Flux.Store = Store
+Flux.Actions = Actions
 

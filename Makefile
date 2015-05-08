@@ -3,6 +3,7 @@ FILES = \
 	src/flex.js \
 	src/flux.js \
 	src/mixins.js \
+	src/actions.js \
 	src/store.js \
 	src/util.js \
 

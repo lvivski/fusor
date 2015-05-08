@@ -41,9 +41,10 @@
     }, fail = function(error) {
       controller.fail(error);
       throw error;
-    }, action = function Action(data) {
+    }, action = function Action() {
+      var args = arguments, ctx = this;
       return new Promise(function(resolve) {
-        resolve(handler(data));
+        resolve(handler.apply(ctx, args));
       }).then(next, fail);
     }, extra = {
       actionName: name,
@@ -58,17 +59,19 @@
     parent || (parent = "");
     var actions = {};
     if (isFunction(spec)) {
-      spec = new spec();
-    }
-    for (var action in spec) if (spec.hasOwnProperty(action)) {
-      var value = spec[action], actionName = isString(value) ? value : action;
-      var parentActionName = parent + actionName;
-      if (isObject(value)) {
-        var handler = value.$;
-        delete value.$;
-        actions[actionName] = assign(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
-      } else {
-        actions[actionName] = this.createAction(parentActionName, value);
+      assign(spec.prototype, Actions.prototype);
+      actions = new spec();
+    } else {
+      for (var action in spec) if (spec.hasOwnProperty(action)) {
+        var value = spec[action], actionName = isString(value) ? value : action;
+        var parentActionName = parent + actionName;
+        if (isObject(value)) {
+          var handler = value.$;
+          delete value.$;
+          actions[actionName] = assign(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
+        } else {
+          actions[actionName] = this.createAction(parentActionName, value);
+        }
       }
     }
     return actions;
@@ -82,6 +85,7 @@
   Flux.Promise = Promise;
   Flux.Observable = Observable;
   Flux.Store = Store;
+  Flux.Actions = Actions;
   Flux.ListenerMixin = {
     componentWillMount: function() {
       this.subscriptions = [];
@@ -96,6 +100,13 @@
       this.subscriptions.push(stream.listen(listener));
     }
   };
+  function Actions() {
+    for (var name in this.constructor.prototype) {
+      if (name !== "constructor" && isFunction(this[name])) {
+        this[name] = Flux.createAction(name, this[name]);
+      }
+    }
+  }
   function Store() {
     this.initialState || (this.initialState = {});
     this.__controller__ = Observable.controlSync();

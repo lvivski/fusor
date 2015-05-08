@@ -2,14 +2,14 @@
 
 Flexible Flux implementation
 
-##API
+## API
 
-####`Flex.createAction(name[, fn])` 
+#### `Flex.createAction(name[, fn])` 
 Creates a new _Action_. Returns an _Observable/Function_.
 
 * `.listen(onSuccess, onFail)` Subscribe to an _Action_. Returns a function, that will unsubscribe you, once called. `onSuccess` or `onFail` callback will be called depending on the _Action_ result. 
 
-####`Flex.createActions(spec)`
+#### `Flex.createActions(spec)`
 Creates multiple actions based on the provided `spec`. Supports sub-actions: 
 ```js
 var Actions = Flex.createActions({
@@ -28,13 +28,13 @@ Actions can later be used as:
 _**Note:** Action call returns a `Promise`, that is resolved with a `function`, that will synchronously propagate changes to subscribed _Store_. 
 May be used together with `Promise.all()` in isomorphic apps._
 
-####`Flex.createStore(spec)`
+#### `Flex.createStore(spec)`
 Creates a new _Store_. Returns a `Flex.Store` object. 
 
 * `initialize` method, it will be used as a `constructor`. 
 * `initialState` property will be used a _Store_'s initial state.
 
-####`Flex.Store`
+#### `Flex.Store`
 Store constructor
 
 * `.getInitialState()` Returns _Store_ initial state
@@ -53,21 +53,24 @@ Store constructor
 `ActionName` is formed as (_ParentName_ + _ChildName_): `Parent`, `ParentChild`, `Parent2Child3` etc.
 
 
-####`Flex.ListenerMixin`
+#### `Flex.ListenerMixin`
 Simplifies _Component_ subscription/unsubscription to _Store_.
 
 * `.listenTo(store, onData)` Subscribes _Component_ to _Store_ changes. Unsubscribes on `componentWillUnmount`.
 
-####`Flex.saveState(store)`
+#### `Flex.saveState(store)`
 Returns current `store` state as a `JSON` string. 
 
-####`Flex.restoreState(store, savedState)`
+#### `Flex.restoreState(store, savedState)`
 Applies `savedState` to `store` and propagates changes to _Components_. May be used in isomorphic apps.
 
-####`Flex.Promise`
+#### `Flex.replay(actions)` & `Flex.replayActions(actions)`
+Runs a sequence of _Actions_ and returns a promise that will be resolved, when they all finish running, so you can render 
+
+#### `Flex.Promise`
 Promise constructor
 
-####`Flex.Observable`
+#### `Flex.Observable`
 Observable constructor
 
 
