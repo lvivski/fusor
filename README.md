@@ -35,7 +35,7 @@ Creates a new _Store_. Returns a `Flex.Store` object.
 * `initialState` property will be used a _Store_'s initial state.
 
 #### `Flex.Store`
-Store constructor
+Store constructor, extend it to create a new _Store_ using ES6 syntax
 
 * `.getInitialState()` Returns _Store_ initial state
 
@@ -52,6 +52,8 @@ Store constructor
 * `.on<`_`ActionName`_`>()` & `.on<`_`ActionName`_`>Fail()` If no callbacks provided to `.listenTo()` method, appropriate _Store_ methods will be used as callbacks.
 `ActionName` is formed as (_ParentName_ + _ChildName_): `Parent`, `ParentChild`, `Parent2Child3` etc.
 
+#### `Flex.Actions`
+Actions constructor, extend it to create a new _Actions_ using ES6 syntax
 
 #### `Flex.ListenerMixin`
 Simplifies _Component_ subscription/unsubscription to _Store_.
