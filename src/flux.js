@@ -1,3 +1,5 @@
+function Flux() {}
+
 Flux.createStore = function (store) {
 	if (isFunction(store)) {
 		assign(store.prototype, Store.prototype)
@@ -16,7 +18,7 @@ Flux.createAction = function (name, handler) {
 	if (!isFunction(handler)) {
 		handler = function (_) {return _}
 	}
-	var controller = Observable.controlSync(),
+	var controller = Observable.control(true),
 		stream = controller.stream,
 		next = function (value) {
 			controller.next(value)
@@ -26,20 +28,25 @@ Flux.createAction = function (name, handler) {
 			controller.fail(error)
 			throw error
 		},
+		replay = function () {
+			if (!(this.isFulfilled || this.isRejected)) return
+			return this.isFulfilled ? next(this.value) : fail(this.value)
+		},
 		action = function Action() {
 			var args = arguments,
-				ctx = this
-			return new Promise(function (resolve) {
+				ctx = this,
+				promise = new Promise(function (resolve) {
 					resolve(handler.apply(ctx, args))
 				})
 				.then(next, fail)
+			promise._ = replay
+			return promise
 		},
 		extra = {
 			actionName: name,
 			listen: function (onNext, onFail) {
 				return stream.listen(onNext, onFail)
-			},
-			set: next
+			}
 		}
 	return assign(action, extra)
 }
@@ -80,6 +87,27 @@ Flux.saveState = function (store) {
 Flux.restore =
 Flux.restoreState = function (store, state) {
 	store.set(isObject(state) ? state : JSON.parse(state))
+}
+
+Flux.replay =
+Flux.replayActions = function (actions, stores) {
+	return Promise.all(actions).then(function (results) {
+		return {
+			then: function (callback) {
+				return new Promise(function (resolve) {
+					var i = 0
+					while (i < stores.length) {
+						stores[i++].reset()
+					}
+					i = 0
+					while (i < actions.length) {
+						actions[i++]._()
+					}
+					resolve(callback(results))
+				})
+			}
+		}
+	})
 }
 
 Flux.Promise = Promise

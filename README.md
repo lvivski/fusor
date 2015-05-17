@@ -25,7 +25,7 @@ var Actions = Flex.createActions({
 Actions can later be used as:
 `Actions.Parent()`, `Actions.Parent2.Child3()` etc.
 
-_**Note:** Action call returns a `Promise`, that is resolved with a `function`, that will synchronously propagate changes to subscribed _Store_. 
+_**Note:** Action call returns a `Promise`, that is resolved with a `function`, that will synchronously propagate changes to subscribed Store. 
 May be used together with `Promise.all()` in isomorphic apps._
 
 #### `Flex.createStore(spec)`
@@ -66,8 +66,8 @@ Returns current `store` state as a `JSON` string.
 #### `Flex.restoreState(store, savedState)`
 Applies `savedState` to `store` and propagates changes to _Components_. May be used in isomorphic apps.
 
-#### `Flex.replay(actions)` & `Flex.replayActions(actions)`
-Runs a sequence of _Actions_ and returns a promise that will be resolved, when they all finish running, so you can render 
+#### `Flex.replay(actions, stores)` & `Flex.replayActions(actions, stores)`
+Runs a sequence of _Actions_ and returns a promise that will be resolved, when they all finish running. _Stores_ will be reseted before resolving the promise. Can be used for serverside rendering.
 
 #### `Flex.Promise`
 Promise constructor

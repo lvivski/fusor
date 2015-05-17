@@ -1,6 +1,6 @@
 {
   "name": "flex",
-  "version": "0.1.12",
+  "version": "0.2.0",
   "description": "Flexible Flux Implementation",
   "author": "Yehor Lvivski <lvivski@gmail.com>",
   "scripts": {
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "davy": "^0.3.3",
-    "streamlet": "^0.2.0"
+    "streamlet": "^0.3.0"
   },
   "license": "MIT"
 }

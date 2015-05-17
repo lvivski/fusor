@@ -1,4 +1,4 @@
-var Promise, Observable, Flux = {}
+var Promise, Observable
 if (typeof define === 'function' && define.amd) {
     define(['davy', 'streamlet'], function (davy, streamlet) {
         Promise = davy

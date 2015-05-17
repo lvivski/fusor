@@ -1,6 +1,6 @@
 function Store() {
 	this.initialState || (this.initialState = {})
-	this.__controller__ = Observable.controlSync()
+	this.__controller__ = Observable.control(true)
 	this.__state__ = {}
 	this.set(this.getInitialState())
 }
