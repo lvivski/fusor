@@ -63,10 +63,10 @@ Simplifies _Component_ subscription/unsubscription to _Store_.
 Returns current `store` state as a `JSON` string. 
 
 #### `Flex.restoreState(store, savedState)`
-Applies `savedState` to `store` and propagates changes to _Components_. Can be used for serverside rendering.
+Applies `savedState` to `store` and propagates changes to _Components_. Can be used for server-side rendering.
 
 #### `Flex.replay(actions, stores)` & `Flex.replayActions(actions, stores)`
-Runs a sequence of _Actions_ and returns a promise that will be resolved, when they all finish running. _Stores_ will be reseted before resolving the promise. Can be used for serverside rendering.
+Runs a sequence of _Actions_ and returns a promise that will be resolved, when they all finish running. _Stores_ will be reseted before resolving the promise. Can be used for server-side rendering.
 
 #### `Flex.Promise`
 Promise constructor
