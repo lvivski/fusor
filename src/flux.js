@@ -30,11 +30,11 @@ Flux.createAction = function (name, handler) {
 		},
 		action = function Action() {
 			var args = arguments,
-				ctx = this;
+				ctx = this
 			return new Promise(function (resolve) {
 					resolve(handler.apply(ctx, args))
 				})
-				.then(next, fail);
+				.then(next, fail)
 		},
 		extra = {
 			actionName: name,
