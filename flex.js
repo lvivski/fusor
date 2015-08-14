@@ -42,15 +42,11 @@
     }, fail = function(error) {
       controller.fail(error);
       throw error;
-    }, replay = function() {
-      if (!(this.isFulfilled || this.isRejected)) return;
-      return this.isFulfilled ? next(this.value) : fail(this.value);
     }, action = function Action() {
-      var args = arguments, ctx = this, promise = new Promise(function(resolve) {
+      var args = arguments, ctx = this;
+      return new Promise(function(resolve) {
         resolve(handler.apply(ctx, args));
       }).then(next, fail);
-      promise._ = replay;
-      return promise;
     }, extra = {
       actionName: name,
       listen: function(onNext, onFail) {
@@ -86,24 +82,8 @@
   Flux.restore = Flux.restoreState = function(store, state) {
     store.set(isObject(state) ? state : JSON.parse(state));
   };
-  Flux.replay = Flux.replayActions = function(actions, stores) {
-    return Promise.all(actions).then(function(results) {
-      return {
-        then: function(callback) {
-          return new Promise(function(resolve) {
-            var i = 0;
-            while (i < stores.length) {
-              stores[i++].reset();
-            }
-            i = 0;
-            while (i < actions.length) {
-              actions[i++]._();
-            }
-            resolve(callback(results));
-          });
-        }
-      };
-    });
+  Flux.replay = Flux.replayActions = function(actions) {
+    return Promise.all(actions);
   };
   Flux.Promise = Promise;
   Flux.Observable = Observable;
