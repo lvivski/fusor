@@ -1,6 +1,6 @@
 JS_COMPILER ?= ./node_modules/uglify-js/bin/uglifyjs
 FILES = \
-	src/flex.js \
+	src/fusor.js \
 	src/flux.js \
 	src/mixins.js \
 	src/actions.js \
@@ -8,10 +8,10 @@ FILES = \
 	src/util.js \
 
 all: \
-	flex.js \
-	flex.min.js
+	fusor.js \
+	fusor.min.js
 
-flex.js: ${FILES}
+fusor.js: ${FILES}
 	@rm -f $@
 	@echo "(function(global){" > $@.tmp
 	@echo "'use strict'" >> $@.tmp
@@ -21,7 +21,7 @@ flex.js: ${FILES}
 	@rm $@.tmp
 	@chmod a-w $@
 
-flex.min.js: flex.js
+fusor.min.js: fusor.js
 	@rm -f $@
 	@$(JS_COMPILER) $< -c -m -o $@ \
 		--source-map $@.map \
@@ -32,4 +32,4 @@ deps:
 	npm install
 
 clean:
-	rm -f flex*.js*
+	rm -f fusor*.js*

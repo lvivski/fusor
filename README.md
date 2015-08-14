@@ -1,18 +1,18 @@
-# Flex
+# Fusor
 
 Flexible Flux implementation
 
 ## API
 
-#### `Flex.createAction(name[, fn])` 
+#### `Fusor.createAction(name[, fn])` 
 Creates a new _Action_. Returns an _Observable/Function_.
 
 * `.listen(onSuccess, onFail)` Subscribe to an _Action_. Returns a function, that will unsubscribe you, once called. `onSuccess` or `onFail` callback will be called depending on the _Action_ result. 
 
-#### `Flex.createActions(spec)`
+#### `Fusor.createActions(spec)`
 Creates multiple actions based on the provided `spec`. Supports sub-actions: 
 ```js
-var Actions = Flex.createActions({
+var Actions = Fusor.createActions({
     Parent: {
         $: function () {}, // optional Parent implementation 
         Child: 'Child',
@@ -27,13 +27,13 @@ Actions can later be used as:
 
 _**Note:** Action call returns a `Promise`. They can be chained as regular promises for sequential action chains._
 
-#### `Flex.createStore(spec)`
-Creates a new _Store_. Returns a `Flex.Store` object. 
+#### `Fusor.createStore(spec)`
+Creates a new _Store_. Returns a `Fusor.Store` object. 
 
 * `initialize` method, it will be used as a `constructor`. 
 * `initialState` property will be used a _Store_'s initial state.
 
-#### `Flex.Store`
+#### `Fusor.Store`
 Store constructor, extend it to create a new _Store_ using ES6 syntax
 
 * `.getInitialState()` Returns _Store_ initial state
@@ -51,27 +51,27 @@ Store constructor, extend it to create a new _Store_ using ES6 syntax
 * `.on<`_`ActionName`_`>()` & `.on<`_`ActionName`_`>Fail()` If no callbacks provided to `.listenTo()` method, appropriate _Store_ methods will be used as callbacks.
 `ActionName` is formed as (_ParentName_ + _ChildName_): `Parent`, `ParentChild`, `Parent2Child3` etc.
 
-#### `Flex.Actions`
+#### `Fusor.Actions`
 Actions constructor, extend it to create a new _Actions_ using ES6 syntax
 
-#### `Flex.ListenerMixin`
+#### `Fusor.ListenerMixin`
 Simplifies _Component_ subscription/unsubscription to _Store_.
 
 * `.listenTo(store, onData)` Subscribes _Component_ to _Store_ changes. Unsubscribes on `componentWillUnmount`.
 
-#### `Flex.saveState(store)`
+#### `Fusor.saveState(store)`
 Returns current `store` state as a `JSON` string. 
 
-#### `Flex.restoreState(store, savedState)`
+#### `Fusor.restoreState(store, savedState)`
 Applies `savedState` to `store` and propagates changes to _Components_. Can be used for server-side rendering.
 
-#### `Flex.replay(actions)` & `Flex.replayActions(actions)`
+#### `Fusor.replay(actions)` & `Fusor.replayActions(actions)`
 Runs a sequence of _Actions_ and returns a promise that will be resolved, when they all finish running.
 
-#### `Flex.Promise`
+#### `Fusor.Promise`
 Promise constructor
 
-#### `Flex.Observable`
+#### `Fusor.Observable`
 Observable constructor
 
 

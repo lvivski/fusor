@@ -12,5 +12,5 @@ if (typeof define === 'function' && define.amd) {
 } else {
     Promise = global.Davy
     Observable = global.Streamlet
-    global.Flex = Flux
+    global.Fusor = Flux
 }

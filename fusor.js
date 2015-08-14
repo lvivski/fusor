@@ -14,7 +14,7 @@
   } else {
     Promise = global.Davy;
     Observable = global.Streamlet;
-    global.Flex = Flux;
+    global.Fusor = Flux;
   }
   function Flux() {}
   Flux.createStore = function(store) {
