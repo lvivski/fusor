@@ -32,9 +32,7 @@
   };
   Flux.createAction = function(name, handler) {
     if (!isFunction(handler)) {
-      handler = function(_) {
-        return _;
-      };
+      handler = identity;
     }
     var controller = Observable.control(true), stream = controller.stream, next = function(value) {
       controller.next(value);
@@ -188,5 +186,8 @@
   }
   function isString(str) {
     return str && typeof str === "string";
+  }
+  function identity(_) {
+    return _;
   }
 })(this);

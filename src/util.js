@@ -40,3 +40,7 @@ function isFunction(fn) {
 function isString(str) {
 	return str && typeof str === 'string'
 }
+
+function identity(_) {
+	return _
+}

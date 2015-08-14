@@ -16,7 +16,7 @@ Flux.createStore = function (store) {
 
 Flux.createAction = function (name, handler) {
 	if (!isFunction(handler)) {
-		handler = function (_) {return _}
+		handler = identity
 	}
 	var controller = Observable.control(true),
 		stream = controller.stream,
