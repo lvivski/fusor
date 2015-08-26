@@ -33,11 +33,11 @@ Store.prototype.listen = function (callback) {
 }
 
 Store.prototype.listenTo = function (action, onNext, onFail) {
-	if (isFunction(action) && isString(action.actionName)) {
-		var actionName = action.actionName
-		actionName = actionName[0].toUpperCase() + actionName.slice(1)
-		onNext = onNext || this['on' + actionName]
-		onFail = onFail || this['on' + actionName + 'Fail']
+	if (isFunction(action) && isString(action.actionType)) {
+		var actionType = action.actionType
+		actionType = actionType[0].toUpperCase() + actionType.slice(1)
+		onNext = onNext || this['on' + actionType]
+		onFail = onFail || this['on' + actionType + 'Fail']
 
 		if (isFunction(onNext) || isFunction(onFail)) {
 			action.listen(

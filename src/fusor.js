@@ -10,7 +10,7 @@ if (typeof define === 'function' && define.amd) {
     Observable = require('streamlet')
     module.exports = Flux
 } else {
-    Promise = global.Davy
-    Observable = global.Streamlet
-    global.Fusor = Flux
+    Promise = root.Davy
+    Observable = root.Streamlet
+    root.Fusor = Flux
 }

@@ -14,7 +14,7 @@ Flux.createStore = function (store) {
 	return store
 }
 
-Flux.createAction = function (name, handler) {
+Flux.createAction = function (actionType, handler) {
 	if (!isFunction(handler)) {
 		handler = identity
 	}
@@ -37,7 +37,7 @@ Flux.createAction = function (name, handler) {
 				.then(next, fail)
 		},
 		extra = {
-			actionName: name,
+			actionType: actionType,
 			listen: function (onNext, onFail) {
 				return stream.listen(onNext, onFail)
 			}
@@ -54,19 +54,19 @@ Flux.createActions = function (spec, parent) {
 	} else {
 		for (var action in spec) if (spec.hasOwnProperty(action)) {
 			var value = spec[action],
-				actionName = isString(value) ? value : action
+				actionType = isString(value) ? value : action
 
-			var parentActionName = parent + actionName
+			var parentActionType = parent + actionType
 
 			if (isObject(value)) {
 				var handler = value.$
 				delete value.$
-				actions[actionName] = assign(
-					this.createAction(parentActionName, handler),
-					this.createActions(value, parentActionName)
+				actions[actionType] = assign(
+					this.createAction(parentActionType, handler),
+					this.createActions(value, parentActionType)
 				)
 			} else {
-				actions[actionName] = this.createAction(parentActionName, value)
+				actions[actionType] = this.createAction(parentActionType, value)
 			}
 		}
 	}

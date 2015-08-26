@@ -1,4 +1,4 @@
-(function(global) {
+(function(root) {
   "use strict";
   var Promise, Observable;
   if (typeof define === "function" && define.amd) {
@@ -12,9 +12,9 @@
     Observable = require("streamlet");
     module.exports = Flux;
   } else {
-    Promise = global.Davy;
-    Observable = global.Streamlet;
-    global.Fusor = Flux;
+    Promise = root.Davy;
+    Observable = root.Streamlet;
+    root.Fusor = Flux;
   }
   function Flux() {}
   Flux.createStore = function(store) {
@@ -30,7 +30,7 @@
     Store.call(store);
     return store;
   };
-  Flux.createAction = function(name, handler) {
+  Flux.createAction = function(actionType, handler) {
     if (!isFunction(handler)) {
       handler = identity;
     }
@@ -46,7 +46,7 @@
         resolve(handler.apply(ctx, args));
       }).then(next, fail);
     }, extra = {
-      actionName: name,
+      actionType: actionType,
       listen: function(onNext, onFail) {
         return stream.listen(onNext, onFail);
       }
@@ -61,14 +61,14 @@
       actions = new spec();
     } else {
       for (var action in spec) if (spec.hasOwnProperty(action)) {
-        var value = spec[action], actionName = isString(value) ? value : action;
-        var parentActionName = parent + actionName;
+        var value = spec[action], actionType = isString(value) ? value : action;
+        var parentActionType = parent + actionType;
         if (isObject(value)) {
           var handler = value.$;
           delete value.$;
-          actions[actionName] = assign(this.createAction(parentActionName, handler), this.createActions(value, parentActionName));
+          actions[actionType] = assign(this.createAction(parentActionType, handler), this.createActions(value, parentActionType));
         } else {
-          actions[actionName] = this.createAction(parentActionName, value);
+          actions[actionType] = this.createAction(parentActionType, value);
         }
       }
     }
@@ -102,7 +102,8 @@
     }
   };
   function Actions() {
-    for (var name in this.constructor.prototype) {
+    var proto = this.constructor.prototype;
+    for (var name in proto) if (proto.hasOwnProperty(name)) {
       if (name !== "constructor" && isFunction(this[name])) {
         this[name] = Flux.createAction(name, this[name]);
       }
@@ -134,11 +135,11 @@
     return this.__controller__.stream.listen(callback);
   };
   Store.prototype.listenTo = function(action, onNext, onFail) {
-    if (isFunction(action) && isString(action.actionName)) {
-      var actionName = action.actionName;
-      actionName = actionName[0].toUpperCase() + actionName.slice(1);
-      onNext = onNext || this["on" + actionName];
-      onFail = onFail || this["on" + actionName + "Fail"];
+    if (isFunction(action) && isString(action.actionType)) {
+      var actionType = action.actionType;
+      actionType = actionType[0].toUpperCase() + actionType.slice(1);
+      onNext = onNext || this["on" + actionType];
+      onFail = onFail || this["on" + actionType + "Fail"];
       if (isFunction(onNext) || isFunction(onFail)) {
         action.listen(onNext && onNext.bind(this), onFail && onFail.bind(this));
       }
@@ -190,4 +191,4 @@
   function identity(_) {
     return _;
   }
-})(this);
+})(Function("return this")());

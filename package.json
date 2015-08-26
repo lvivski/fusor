@@ -1,6 +1,6 @@
 {
   "name": "fusor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Flexible Flux Implementation",
   "author": "Yehor Lvivski <lvivski@gmail.com>",
   "scripts": {
@@ -18,11 +18,11 @@
     "flexible"
   ],
   "devDependencies": {
-    "uglify-js": "^2.4.19"
+    "uglify-js": "*"
   },
   "dependencies": {
-    "davy": "^0.3.3",
-    "streamlet": "^0.3.0"
+    "davy": "^1.0.0",
+    "streamlet": "^1.0.0"
   },
   "license": "MIT"
 }
