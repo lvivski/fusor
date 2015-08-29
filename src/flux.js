@@ -18,7 +18,7 @@ Flux.createAction = function (actionType, handler) {
 	if (!isFunction(handler)) {
 		handler = identity
 	}
-	var controller = Observable.control(true),
+	var controller = Observable.control(),
 		stream = controller.stream,
 		next = function (value) {
 			controller.next(value)
@@ -38,9 +38,7 @@ Flux.createAction = function (actionType, handler) {
 		},
 		extra = {
 			actionType: actionType,
-			listen: function (onNext, onFail) {
-				return stream.listen(onNext, onFail)
-			}
+			stream: stream
 		}
 	return assign(action, extra)
 }

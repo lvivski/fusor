@@ -1,6 +1,8 @@
 function Store() {
 	this.initialState || (this.initialState = {})
-	this.__controller__ = Observable.control(true)
+	var controller = Observable.control(true)
+	this.stream = controller.stream
+	this.add = controller.add.bind(controller)
 	this.__state__ = {}
 	this.set(this.getInitialState())
 }
@@ -17,19 +19,14 @@ Store.prototype.getState = function () {
 Store.prototype.set =
 Store.prototype.setState = function (state) {
 	if (!isObject(state)) return
-	assign(this.__state__, state)
-	this.__controller__.add(state)
-	return this.__state__
+	this.add(state)
+	return assign(this.__state__, state)
 }
 
 Store.prototype.reset =
 Store.prototype.resetState = function () {
 	this.__state__ = {}
 	return this.set(this.getInitialState())
-}
-
-Store.prototype.listen = function (callback) {
-	return this.__controller__.stream.listen(callback)
 }
 
 Store.prototype.listenTo = function (action, onNext, onFail) {
@@ -40,7 +37,7 @@ Store.prototype.listenTo = function (action, onNext, onFail) {
 		onFail = onFail || this['on' + actionType + 'Fail']
 
 		if (isFunction(onNext) || isFunction(onFail)) {
-			action.listen(
+			action.stream.listen(
 				onNext && onNext.bind(this),
 				onFail && onFail.bind(this)
 			)

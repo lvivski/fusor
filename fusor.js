@@ -34,7 +34,7 @@
     if (!isFunction(handler)) {
       handler = identity;
     }
-    var controller = Observable.control(true), stream = controller.stream, next = function(value) {
+    var controller = Observable.control(), stream = controller.stream, next = function(value) {
       controller.next(value);
       return value;
     }, fail = function(error) {
@@ -47,9 +47,7 @@
       }).then(next, fail);
     }, extra = {
       actionType: actionType,
-      listen: function(onNext, onFail) {
-        return stream.listen(onNext, onFail);
-      }
+      stream: stream
     };
     return assign(action, extra);
   };
@@ -97,8 +95,8 @@
         this.subscriptions[i++]();
       }
     },
-    listenTo: function(stream, listener) {
-      this.subscriptions.push(stream.listen(listener));
+    listenTo: function(store, listener) {
+      this.subscriptions.push(store.stream.listen(listener));
     }
   };
   function Actions() {
@@ -111,7 +109,9 @@
   }
   function Store() {
     this.initialState || (this.initialState = {});
-    this.__controller__ = Observable.control(true);
+    var controller = Observable.control(true);
+    this.stream = controller.stream;
+    this.add = controller.add.bind(controller);
     this.__state__ = {};
     this.set(this.getInitialState());
   }
@@ -123,16 +123,12 @@
   };
   Store.prototype.set = Store.prototype.setState = function(state) {
     if (!isObject(state)) return;
-    assign(this.__state__, state);
-    this.__controller__.add(state);
-    return this.__state__;
+    this.add(state);
+    return assign(this.__state__, state);
   };
   Store.prototype.reset = Store.prototype.resetState = function() {
     this.__state__ = {};
     return this.set(this.getInitialState());
-  };
-  Store.prototype.listen = function(callback) {
-    return this.__controller__.stream.listen(callback);
   };
   Store.prototype.listenTo = function(action, onNext, onFail) {
     if (isFunction(action) && isString(action.actionType)) {
@@ -141,7 +137,7 @@
       onNext = onNext || this["on" + actionType];
       onFail = onFail || this["on" + actionType + "Fail"];
       if (isFunction(onNext) || isFunction(onFail)) {
-        action.listen(onNext && onNext.bind(this), onFail && onFail.bind(this));
+        action.stream.listen(onNext && onNext.bind(this), onFail && onFail.bind(this));
       }
     }
     if (arguments.length === 1 && (isFunction(action) || isObject(action))) {

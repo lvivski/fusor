@@ -10,7 +10,7 @@ Flux.ListenerMixin = {
 		}
 	},
 
-	listenTo: function (stream, listener) {
-		this.subscriptions.push(stream.listen(listener))
+	listenTo: function (store, listener) {
+		this.subscriptions.push(store.stream.listen(listener))
 	}
 }
