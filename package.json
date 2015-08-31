@@ -1,6 +1,6 @@
 {
   "name": "fusor",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Flexible Flux Implementation",
   "author": "Yehor Lvivski <lvivski@gmail.com>",
   "scripts": {
