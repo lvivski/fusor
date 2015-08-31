@@ -34,7 +34,7 @@
     if (!isFunction(handler)) {
       handler = identity;
     }
-    var controller = Observable.control(), stream = controller.stream, next = function(value) {
+    var controller = Observable.control(true), stream = controller.stream, next = function(value) {
       controller.next(value);
       return value;
     }, fail = function(error) {

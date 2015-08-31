@@ -18,7 +18,7 @@ Flux.createAction = function (actionType, handler) {
 	if (!isFunction(handler)) {
 		handler = identity
 	}
-	var controller = Observable.control(),
+	var controller = Observable.control(true),
 		stream = controller.stream,
 		next = function (value) {
 			controller.next(value)
